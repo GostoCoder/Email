@@ -1,0 +1,1 @@
+# Campaign model package

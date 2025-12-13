@@ -1,0 +1,64 @@
+# =============================================================================
+# Dockerfile simplifié pour Outil-Emailing (Backend seul - Tests)
+# =============================================================================
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Métadonnées de l'image
+LABEL maintainer="Almadia Solutions"
+LABEL description="Outil Emailing - Architecture MVVM Feature-First (Backend)"
+LABEL version="1.0.0"
+
+# Installer les dépendances système nécessaires
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copier et installer les dépendances Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir gunicorn
+
+# Copier la structure MVVM complète du backend
+COPY app ./app
+COPY templates ./templates
+
+# Créer les répertoires nécessaires pour les données
+RUN mkdir -p /app/data/uploads /app/data/logs
+
+# Créer un répertoire dist vide pour le frontend (sera ajouté plus tard)
+RUN mkdir -p /app/app/core/frontend/dist && \
+    echo '<!DOCTYPE html><html><head><title>Backend Only</title></head><body><h1>API Backend Running</h1><p>Check /api/health</p></body></html>' > /app/app/core/frontend/dist/index.html
+
+# Créer un utilisateur non-root pour la sécurité
+RUN useradd -m -u 1000 appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
+# Exposer le port de l'application
+EXPOSE 5000
+
+# Variables d'environnement par défaut
+ENV FLASK_ENV=production \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    APP_PORT=5000
+
+# Health check pour les orchestrateurs
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
+
+# Commande de démarrage avec Gunicorn pour la production
+CMD ["gunicorn", \
+     "--bind", "0.0.0.0:5000", \
+     "--workers", "2", \
+     "--threads", "2", \
+     "--timeout", "120", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "--log-level", "info", \
+     "app.main:app"]

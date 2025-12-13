@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reception - Guide de Style Glassmorphism</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 89, 96, 0.03) 0%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(255, 199, 59, 0.03) 100%
+      );
+      min-height: 100vh;
+      padding: 3rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, rgb(0, 89, 96), rgb(255, 199, 59));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 3rem;
+    }
+
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: rgb(0, 89, 96);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .color-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.1);
+      text-align: center;
+    }
+
+    .color-swatch {
+      width: 100%;
+      height: 120px;
+      border-radius: 16px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .color-name {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .color-code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .example-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .example-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, rgb(0, 89, 96), rgb(255, 199, 59));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .example-card:hover::before {
+      opacity: 1;
+    }
+
+    .example-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 
+        0 20px 60px rgba(0, 89, 96, 0.15),
+        0 0 40px rgba(255, 199, 59, 0.1);
+    }
+
+    .icon-wrapper {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(0, 89, 96, 0.1), rgba(255, 199, 59, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .example-card:hover .icon-wrapper {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: rgb(0, 89, 96);
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Type 2 - Gradient Tinted Styles */
+    .gradient-tinted {
+      background: linear-gradient(135deg, rgba(0, 89, 96, 0.15), rgba(255, 199, 59, 0.15));
+      backdrop-filter: blur(12px) saturate(150%);
+      -webkit-backdrop-filter: blur(12px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gradient-tinted::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, rgb(0, 89, 96), rgb(255, 199, 59));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .gradient-tinted:hover::before {
+      opacity: 1;
+    }
+
+    .gradient-tinted:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 
+        0 16px 48px rgba(0, 89, 96, 0.2),
+        0 0 32px rgba(255, 199, 59, 0.15);
+    }
+
+    .gradient-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .gradient-box {
+      height: 150px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-demo {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0 0 24px 24px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, rgb(0, 89, 96), rgb(255, 199, 59));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background: linear-gradient(135deg, rgba(0, 89, 96, 0.1), rgba(255, 199, 59, 0.1));
+      transform: translateY(-2px);
+    }
+
+    .button-demo {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgb(0, 89, 96), rgba(0, 89, 96, 0.8));
+      border: none;
+      padding: 0.75rem 2rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 89, 96, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 89, 96, 0.3);
+    }
+
+    .input-demo {
+      margin-top: 1rem;
+    }
+
+    .input-glass {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-glass:focus {
+      outline: none;
+      border-color: rgb(0, 89, 96);
+      box-shadow: 0 0 0 3px rgba(0, 89, 96, 0.1);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    /* --- New Components CSS --- */
+
+    /* Toggle Switch */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-input {
+      display: none;
+    }
+
+    .toggle-label {
+      width: 60px;
+      height: 30px;
+      display: block;
+      position: relative;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      transition: background 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .toggle-label::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #005960, #FFC73B);
+      box-shadow: 0 4px 12px rgba(0, 89, 96, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-input:checked + .toggle-label {
+      background: rgba(0, 89, 96, 0.15);
+    }
+
+    .toggle-input:checked + .toggle-label::after {
+      transform: translateX(30px);
+    }
+
+    /* Search Box */
+    .search-box {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.9rem 3rem 0.9rem 1.2rem;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.3);
+      font-size: 1rem;
+      transition: 0.3s;
+      color: #333;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 89, 96, 0.15);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #005960;
+      font-size: 1.2rem;
+    }
+
+    /* Glass Cards Variants */
+    .panel-glass {
+      background: rgba(255,255,255,0.6);
+      border-radius: 28px;
+      padding: 2rem;
+      backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-glow {
+      position: relative;
+      border-radius: 26px;
+      padding: 2rem;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.25);
+      overflow: hidden;
+    }
+
+    .card-glow::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, #005960, #FFC73B);
+      opacity: 0.35;
+      z-index: -1;
+      border-radius: inherit;
+      filter: blur(10px);
+    }
+
+    /* Pills */
+    .tag-pill {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      background: linear-gradient(135deg, rgba(0,89,96,0.1), rgba(255,199,59,0.1));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.4);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #005960;
+      margin-right: 0.5rem;
+    }
+
+    /* Toast */
+    .toast-glass {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 1rem 1.5rem;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.2);
+      animation: slideUpFade 0.6s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 1000;
+      color: #005960;
+      font-weight: 500;
+    }
+
+    @keyframes slideUpFade {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 0.7rem 1.4rem;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.25);
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .tab.active,
+    .tab:hover {
+      background: linear-gradient(135deg, rgba(0,89,96,0.1), rgba(255,199,59,0.1));
+      border-color: rgba(0,89,96,0.2);
+      color: #005960;
+    }
+
+    /* Modal */
+    .modal-glass {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(30px) saturate(180%);
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 15px 60px rgba(0,89,96,0.2);
+      max-width: 500px;
+      margin: 2rem 0;
+    }
+
+    /* Skeleton Loader */
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        rgba(0, 89, 96, 0.1) 0%,
+        rgba(255, 199, 59, 0.2) 50%,
+        rgba(0, 89, 96, 0.1) 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .skeleton-card {
+      padding: 2rem;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .skeleton-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      margin-bottom: 1rem;
+    }
+
+    .skeleton-line {
+      height: 20px;
+      margin-bottom: 0.75rem;
+      border-radius: 10px;
+    }
+
+    .skeleton-line.short {
+      width: 60%;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      width: 100%;
+      height: 12px;
+      background: rgba(255,255,255,0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, rgb(0, 89, 96), rgb(255, 199, 59));
+      border-radius: 20px;
+      transition: width 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 89, 96, 0.3);
+    }
+
+    .progress-bar.animated {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar.animated::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.4),
+        transparent
+      );
+      animation: progressShine 2s infinite;
+    }
+
+    @keyframes progressShine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Badge Notification */
+    .badge-notification {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgb(255, 199, 59), rgb(255, 180, 59));
+      color: rgb(0, 89, 96);
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(255, 199, 59, 0.4);
+      border: 2px solid rgba(255,255,255,0.6);
+    }
+
+    .badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgb(255, 199, 59), rgb(255, 180, 59));
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 2px 8px rgba(255, 199, 59, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      min-width: 200px;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 0.5rem;
+      box-shadow: 0 8px 32px rgba(0, 89, 96, 0.15);
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .dropdown-item:hover {
+      background: linear-gradient(135deg, rgba(0,89,96,0.1), rgba(255,199,59,0.1));
+      color: rgb(0, 89, 96);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      margin: 0.5rem 0;
+      background: linear-gradient(90deg, transparent, rgba(0,89,96,0.2), transparent);
+    }
+
+    /* Tooltip Glass */
+    .tooltip-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip-glass {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 12px;
+      color: rgb(0, 89, 96);
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0, 89, 96, 0.15);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 200;
+    }
+
+    .tooltip-glass::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: rgba(255,255,255,0.85);
+    }
+
+    .tooltip-wrapper:hover .tooltip-glass {
+      opacity: 1;
+    }
+
+    /* Alert Banner */
+    .alert {
+      padding: 1rem 1.5rem;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 16px rgba(0, 89, 96, 0.1);
+    }
+
+    .alert-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .alert-success {
+      border-left: 4px solid rgb(0, 89, 96);
+    }
+
+    .alert-warning {
+      border-left: 4px solid rgb(255, 199, 59);
+    }
+
+    .alert-error {
+      border-left: 4px solid #dc3545;
+    }
+
+    .alert-info {
+      border-left: 4px solid #17a2b8;
+    }
+
+    /* Avatar Circle */
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0,89,96,0.2), rgba(255,199,59,0.2));
+      border: 2px solid rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: rgb(0, 89, 96);
+      box-shadow: 0 4px 12px rgba(0, 89, 96, 0.15);
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-large {
+      width: 80px;
+      height: 80px;
+      font-size: 1.5rem;
+    }
+
+    .avatar-small {
+      width: 32px;
+      height: 32px;
+      font-size: 0.75rem;
+    }
+
+    /* Checkbox Glass */
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .checkbox-glass {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(0,89,96,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .checkbox-glass:checked {
+      background: linear-gradient(135deg, rgb(0, 89, 96), rgba(0, 89, 96, 0.8));
+      border-color: rgb(0, 89, 96);
+    }
+
+    .checkbox-glass:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* Radio Glass */
+    .radio-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .radio-glass {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(0,89,96,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .radio-glass:checked {
+      border-color: rgb(0, 89, 96);
+      border-width: 7px;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      font-size: 0.9rem;
+    }
+
+    .breadcrumb-item {
+      color: rgba(0, 89, 96, 0.6);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb-item:hover {
+      color: rgb(0, 89, 96);
+    }
+
+    .breadcrumb-item.active {
+      color: rgb(0, 89, 96);
+      font-weight: 600;
+    }
+
+    .breadcrumb-separator {
+      color: rgba(0, 89, 96, 0.3);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: rgb(0, 89, 96);
+      border-right-color: rgb(255, 199, 59);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .spinner-small {
+      width: 24px;
+      height: 24px;
+      border-width: 3px;
+    }
+
+    .spinner-large {
+      width: 64px;
+      height: 64px;
+      border-width: 5px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0,89,96,0.2),
+        rgba(255,199,59,0.2),
+        transparent
+      );
+      margin: 2rem 0;
+    }
+
+    .divider-vertical {
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(0,89,96,0.2),
+        rgba(255,199,59,0.2),
+        transparent
+      );
+    }
+
+    /* Stepper */
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(0,89,96,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: rgba(0,89,96,0.5);
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      z-index: 2;
+    }
+
+    .step.active .step-circle {
+      background: linear-gradient(135deg, rgb(0, 89, 96), rgba(0, 89, 96, 0.8));
+      border-color: rgb(0, 89, 96);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 89, 96, 0.3);
+    }
+
+    .step.completed .step-circle {
+      background: linear-gradient(135deg, rgb(0, 89, 96), rgb(255, 199, 59));
+      border-color: rgb(0, 89, 96);
+      color: white;
+    }
+
+    .step-label {
+      font-size: 0.85rem;
+      color: rgba(0,0,0,0.6);
+      font-weight: 500;
+    }
+
+    .step.active .step-label {
+      color: rgb(0, 89, 96);
+      font-weight: 600;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: calc(50% + 20px);
+      width: calc(100% - 40px);
+      height: 2px;
+      background: rgba(0,89,96,0.2);
+      z-index: 1;
+    }
+
+    .step.completed:not(:last-child)::after {
+      background: linear-gradient(90deg, rgb(0, 89, 96), rgb(255, 199, 59));
+    }
+
+    /* Brand Button Styles */
+    .brand-button {
+      background: linear-gradient(135deg, rgba(0, 89, 96, 0.2), rgba(255, 199, 59, 0.2));
+      backdrop-filter: blur(12px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      padding: 1rem 2rem;
+      color: rgb(0, 89, 96);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .brand-button:hover::after {
+      left: 100%;
+    }
+
+    .brand-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 89, 96, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .navbar-demo { flex-direction: column; gap: 1rem; }
+      .nav-links { flex-direction: column; width: 100%; }
+      .stepper { flex-direction: column; gap: 1.5rem; }
+      .step:not(:last-child)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Reception Design System</h1>
+    <p class="subtitle">Glassmorphism - Palette Vert & Jaune Almadia</p>
+
+    <!-- Navbar Demo -->
+    <div class="navbar-demo">
+      <div class="navbar-brand">Reception</div>
+      <div class="nav-links">
+        <a href="#" class="nav-link">Déconnexion</a>
+      </div>
+    </div>
+
+    <!-- Couleurs -->
+    <div class="section">
+      <h2 class="section-title">🎨 Palette de Couleurs</h2>
+      <div class="color-grid">
+        <div class="color-card">
+          <div class="color-swatch" style="background: rgb(0, 89, 96);"></div>
+          <div class="color-name">Vert Almadia</div>
+          <div class="color-code">rgb(0, 89, 96)</div>
+          <div class="color-code">#005960</div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: rgb(255, 199, 59);"></div>
+          <div class="color-name">Jaune Almadia</div>
+          <div class="color-code">rgb(255, 199, 59)</div>
+          <div class="color-code">#FFC73B</div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: rgba(0, 89, 96, 0.1);"></div>
+          <div class="color-name">Vert Léger</div>
+          <div class="color-code">rgba(0, 89, 96, 0.1)</div>
+          <div class="color-code">Backgrounds</div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: rgba(255, 199, 59, 0.1);"></div>
+          <div class="color-name">Jaune Léger</div>
+          <div class="color-code">rgba(255, 199, 59, 0.1)</div>
+          <div class="color-code">Backgrounds</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gradients -->
+    <div class="section">
+      <h2 class="section-title">✨ Gradients</h2>
+      <div class="gradient-showcase">
+        <div class="gradient-box" style="background: linear-gradient(135deg, rgb(0, 89, 96), rgb(255, 199, 59));">
+          Principal
+        </div>
+        <div class="gradient-box" style="background: linear-gradient(135deg, rgba(0, 89, 96, 0.1), rgba(255, 199, 59, 0.1));">
+          Subtil
+        </div>
+        <div class="gradient-box" style="background: linear-gradient(135deg, rgb(0, 89, 96), rgba(0, 89, 96, 0.8));">
+          Boutons
+        </div>
+        <div class="gradient-box" style="background: linear-gradient(90deg, rgb(0, 89, 96), rgb(255, 199, 59));">
+          Horizontal
+        </div>
+      </div>
+    </div>
+
+    <!-- Composants -->
+    <div class="section">
+      <h2 class="section-title">🧩 Composants</h2>
+      
+      <h3 style="margin-bottom: 1rem; color: rgb(0, 89, 96);">Boutons</h3>
+      <div class="button-demo">
+        <button class="btn">Enregistrer</button>
+        <button class="btn">Rechercher</button>
+        <button class="btn">Voir plus</button>
+        <button class="brand-button">Action Principale</button>
+        <button class="brand-button">Découvrir Plus</button>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Input Glass</h3>
+      <div class="input-demo">
+        <input type="text" class="input-glass" placeholder="Rechercher une application...">
+      </div>
+    </div>
+
+    <!-- Cartes -->
+    <div class="section">
+      <h2 class="section-title">🃏 App Cards</h2>
+      <div class="examples-grid">
+        <div class="example-card">
+          <div class="icon-wrapper">📱</div>
+          <div class="card-title">Application 1</div>
+          <div class="card-text">
+            Carte avec effet glassmorphism, hover pour voir les animations
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="icon-wrapper">💻</div>
+          <div class="card-title">Application 2</div>
+          <div class="card-text">
+            Effet verre dépoli avec backdrop blur et gradients subtils
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="icon-wrapper">🚀</div>
+          <div class="card-title">Application 3</div>
+          <div class="card-title">
+            Ligne gradient en haut au hover + élévation
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nouveaux Composants UI -->
+    <div class="section">
+      <h2 class="section-title">✨ Nouveaux Composants UI</h2>
+      
+      <h3 style="margin-bottom: 1rem; color: rgb(0, 89, 96);">Navigation & Tabs</h3>
+      <div class="tabs">
+        <div class="tab active">Accueil</div>
+        <div class="tab">Applications</div>
+        <div class="tab">Paramètres</div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Toggle Switch & Pills</h3>
+      <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+        <div class="toggle-wrapper">
+          <input type="checkbox" id="toggle" class="toggle-input" checked>
+          <label for="toggle" class="toggle-label"></label>
+        </div>
+        <div>
+          <span class="tag-pill">Validé</span>
+          <span class="tag-pill">En attente</span>
+        </div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Search Bar Premium</h3>
+      <div class="search-box">
+        <input type="text" placeholder="Rechercher..." />
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+
+    <!-- Panels & Modals -->
+    <div class="section">
+      <h2 class="section-title">🖼️ Panels & Modals</h2>
+      
+      <div class="examples-grid">
+        <div class="panel-glass">
+          <h3 class="card-title">Frosted Panel</h3>
+          <p class="card-text">Idéal pour les formulaires ou le contenu principal. Fond blanc à 60% avec un flou important.</p>
+        </div>
+        
+        <div class="card-glow">
+          <h3 class="card-title">Gradient Glow Card</h3>
+          <p class="card-text">Une bordure subtilement lumineuse grâce à un gradient en arrière-plan.</p>
+        </div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Glass Modal</h3>
+      <div class="modal-glass">
+        <h3 class="card-title">Titre du modale</h3>
+        <p class="card-text" style="margin-bottom: 1.5rem;">
+          Ceci est un exemple de fenêtre modale avec un effet de verre dépoli très prononcé (blur 30px).
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button class="btn" style="background: rgba(0,0,0,0.05); color: #333; box-shadow: none;">Annuler</button>
+          <button class="btn">Confirmer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Demo -->
+    <div class="toast-glass">
+      <span>✔</span> Données enregistrées
+    </div>
+
+    <!-- Advanced Components -->
+    <div class="section">
+      <h2 class="section-title">🎯 Composants Avancés</h2>
+      
+      <h3 style="margin-bottom: 1rem; color: rgb(0, 89, 96);">Skeleton Loaders</h3>
+      <div class="examples-grid">
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-circle"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-circle"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line short"></div>
+        </div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Progress Bar</h3>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="progress-container">
+          <div class="progress-bar animated" style="width: 65%;"></div>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 40%;"></div>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar animated" style="width: 85%;"></div>
+        </div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Badges & Notifications</h3>
+      <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="position: relative;">
+          <div class="icon-wrapper" style="margin: 0;">🔔</div>
+          <div class="badge-notification" style="position: absolute; top: -5px; right: -5px;">3</div>
+        </div>
+        <div style="position: relative;">
+          <div class="icon-wrapper" style="margin: 0;">💬</div>
+          <div class="badge-notification" style="position: absolute; top: -5px; right: -5px;">12</div>
+        </div>
+        <div style="position: relative;">
+          <div class="icon-wrapper" style="margin: 0;">✉️</div>
+          <div class="badge-dot" style="position: absolute; top: -2px; right: -2px;"></div>
+        </div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Dropdown Menu</h3>
+      <div class="dropdown">
+        <button class="btn">Options ▾</button>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item">📊 Tableau de bord</a>
+          <a href="#" class="dropdown-item">⚙️ Paramètres</a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">🚪 Déconnexion</a>
+        </div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Tooltips Glass</h3>
+      <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <div class="tooltip-wrapper">
+          <button class="btn">Survolez-moi</button>
+          <div class="tooltip-glass">Ceci est un tooltip</div>
+        </div>
+        <div class="tooltip-wrapper">
+          <div class="icon-wrapper" style="margin: 0; cursor: pointer;">ℹ️</div>
+          <div class="tooltip-glass">Information importante</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts & Feedback -->
+    <div class="section">
+      <h2 class="section-title">🔔 Alertes & Feedback</h2>
+      
+      <div class="alert alert-success">
+        <span class="alert-icon">✅</span>
+        <div>
+          <strong>Succès !</strong> Votre action a été effectuée avec succès.
+        </div>
+      </div>
+      
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <div>
+          <strong>Attention !</strong> Veuillez vérifier les informations saisies.
+        </div>
+      </div>
+      
+      <div class="alert alert-error">
+        <span class="alert-icon">❌</span>
+        <div>
+          <strong>Erreur !</strong> Une erreur s'est produite lors de l'opération.
+        </div>
+      </div>
+      
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <div>
+          <strong>Information :</strong> Voici une information utile à connaître.
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Elements -->
+    <div class="section">
+      <h2 class="section-title">📝 Éléments de Formulaire</h2>
+      
+      <h3 style="margin-bottom: 1rem; color: rgb(0, 89, 96);">Avatars</h3>
+      <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <div class="avatar avatar-large">EA</div>
+        <div class="avatar">JD</div>
+        <div class="avatar avatar-small">AB</div>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Checkbox & Radio</h3>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox-glass" checked>
+          <span>Option cochée par défaut</span>
+        </label>
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox-glass">
+          <span>Option non cochée</span>
+        </label>
+        
+        <div style="height: 1rem;"></div>
+        
+        <label class="radio-wrapper">
+          <input type="radio" name="demo" class="radio-glass" checked>
+          <span>Choix A</span>
+        </label>
+        <label class="radio-wrapper">
+          <input type="radio" name="demo" class="radio-glass">
+          <span>Choix B</span>
+        </label>
+      </div>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Breadcrumbs</h3>
+      <nav class="breadcrumbs">
+        <a href="#" class="breadcrumb-item">Accueil</a>
+        <span class="breadcrumb-separator">›</span>
+        <a href="#" class="breadcrumb-item">Applications</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-item active">Détails</span>
+      </nav>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Loading Spinners</h3>
+      <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+        <div class="spinner-small"></div>
+        <div class="spinner"></div>
+        <div class="spinner-large"></div>
+      </div>
+    </div>
+
+    <!-- Dividers & Stepper -->
+    <div class="section">
+      <h2 class="section-title">📏 Séparateurs & Navigation</h2>
+      
+      <h3 style="margin-bottom: 1rem; color: rgb(0, 89, 96);">Dividers</h3>
+      <p class="card-text">Texte avant le séparateur</p>
+      <div class="divider"></div>
+      <p class="card-text">Texte après le séparateur</p>
+
+      <h3 style="margin: 2rem 0 1rem; color: rgb(0, 89, 96);">Stepper - Indicateur d'étapes</h3>
+      <div class="stepper">
+        <div class="step completed">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Informations</div>
+        </div>
+        <div class="step completed">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Configuration</div>
+        </div>
+        <div class="step active">
+          <div class="step-circle">3</div>
+          <div class="step-label">Validation</div>
+        </div>
+        <div class="step">
+          <div class="step-circle">4</div>
+          <div class="step-label">Terminé</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Caractéristiques -->
+    <div class="section">
+      <h2 class="section-title">📋 Caractéristiques</h2>
+      <div class="examples-grid">
+        <div class="example-card">
+          <div class="icon-wrapper">🔵</div>
+          <div class="card-title">Backdrop Blur</div>
+          <div class="card-text">
+            blur(20px) + saturation(180%) pour effet verre moderne
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="icon-wrapper">🔄</div>
+          <div class="card-title">Animations Fluides</div>
+          <div class="card-text">
+            GPU-accelerated avec transform et opacity
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="icon-wrapper">📐</div>
+          <div class="card-title">Border Radius</div>
+          <div class="card-text">
+            16-24px pour formes arrondies harmonieuses
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dropdown toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const dropdownBtn = document.querySelector('.dropdown .btn');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+      
+      if (dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          dropdownMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

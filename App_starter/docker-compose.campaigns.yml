@@ -1,0 +1,115 @@
+version: '3.9'
+
+networks:
+  email_campaign_network:
+    driver: bridge
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: email-campaign-backend
+    env_file:
+      - ./backend/.env
+    environment:
+      - APP_NAME=email-campaign-manager
+      - APP_ENV=production
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+    ports:
+      - "8000:8000"
+    networks:
+      - email_campaign_network
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev
+      - /run:rw,noexec,nosuid,nodev
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          cpus: "1.0"
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    container_name: email-campaign-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - email_campaign_network
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:rw,noexec,nosuid,nodev
+      - /var/run:rw,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    restart: unless-stopped
+
+  # Optional: Redis for advanced queuing and caching
+  # Uncomment if you want to use Celery for background tasks
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: email-campaign-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - email_campaign_network
+  #   command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeMe123}
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "0.5"
+  #         memory: 256M
+  #       reservations:
+  #         cpus: "0.25"
+  #         memory: 128M
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+# volumes:
+#   redis-data:
+#     driver: local

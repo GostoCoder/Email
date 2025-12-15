@@ -1,1 +1,0 @@
-# Campaign viewmodel package

@@ -6,11 +6,24 @@ from core.config import Settings, get_settings
 def get_current_user(
     x_forwarded_user: str | None = Header(default=None, convert_underscores=False),
 ) -> str:
+    """
+    Get current user from ForwardAuth header.
+    Required for production - raises 401 if missing.
+    """
     if not x_forwarded_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing ForwardAuth user header",
         )
+    return x_forwarded_user
+
+
+def get_optional_user(
+    x_forwarded_user: str | None = Header(default=None, convert_underscores=False),
+) -> str | None:
+    """
+    Get current user optionally - for endpoints that work with or without auth.
+    """
     return x_forwarded_user
 
 

@@ -1,0 +1,44 @@
+version: '3.9'
+
+networks:
+  dev_network:
+    driver: bridge
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: email-dev-backend
+    env_file:
+      - ./backend/.env
+    environment:
+      - APP_ENV=development
+      - SUPABASE_URL=http://host.docker.internal:54321
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8000:8000"
+    networks:
+      - dev_network
+    volumes:
+      - ./backend:/app:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3000
+        VITE_SUPABASE_URL: http://localhost:54321
+        VITE_SUPABASE_ANON_KEY: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
+    container_name: email-dev-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - dev_network
+    restart: unless-stopped

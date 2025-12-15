@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { CSVPreview, CSVImportResult, campaignApi } from '../lib/campaignApi';
+import { CSVPreview, CSVImportResult, campaignApi } from '../../lib/campaignApi';
 
 interface CSVImportProps {
   campaignId: string;
@@ -120,13 +120,13 @@ export function CSVImport({ campaignId, onSuccess, onCancel }: CSVImportProps) {
             <div className="summary-card valid">
               <div className="summary-label">Lignes valides</div>
               <div className="summary-value">
-                {preview.preview_rows.filter(r => r.is_valid).length} / {preview.preview_rows.length}
+                {preview.preview_rows.filter((r: { is_valid: boolean }) => r.is_valid).length} / {preview.preview_rows.length}
               </div>
             </div>
             <div className="summary-card invalid">
               <div className="summary-label">Lignes invalides</div>
               <div className="summary-value">
-                {preview.preview_rows.filter(r => !r.is_valid).length}
+                {preview.preview_rows.filter((r: { is_valid: boolean }) => !r.is_valid).length}
               </div>
             </div>
           </div>
@@ -158,7 +158,7 @@ export function CSVImport({ campaignId, onSuccess, onCancel }: CSVImportProps) {
                 </tr>
               </thead>
               <tbody>
-                {preview.preview_rows.map((row) => (
+                {preview.preview_rows.map((row: any) => (
                   <tr key={row.row_number} className={!row.is_valid ? 'invalid-row' : ''}>
                     <td>{row.row_number}</td>
                     <td>{row.email}</td>

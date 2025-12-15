@@ -1,5 +1,5 @@
 # Builder
-FROM node:18-alpine as builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 RUN if [ -f package-lock.json ]; then npm ci; \
@@ -17,9 +17,6 @@ RUN npm run build
 
 # Runtime
 FROM nginx:1.25-alpine
-USER root
-RUN addgroup -g 101 web && adduser -D -G web -u 101 web
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
-USER web

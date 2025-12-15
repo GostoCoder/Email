@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Campaign, campaignApi } from '../lib/campaignApi';
+import { Campaign, campaignApi } from '../../lib/campaignApi';
 
 interface CampaignFormProps {
   campaign?: Campaign;

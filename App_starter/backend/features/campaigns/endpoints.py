@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Backgro
 from fastapi.responses import JSONResponse
 
 from core.config import get_settings
+from core.dependencies import get_current_user
 from core.supabase import get_supabase_client
 from core.template_service import get_template_service
 from features.campaigns.schemas import (
@@ -47,7 +48,7 @@ logger = logging.getLogger(__name__)
 # ============================================
 
 @router.post("/campaigns", response_model=CampaignResponse, status_code=201)
-async def create_campaign(campaign: CampaignCreate):
+async def create_campaign(campaign: CampaignCreate, _: str = Depends(get_current_user)):
     """Create a new email campaign"""
     supabase = get_supabase_client()
     
@@ -69,7 +70,8 @@ async def create_campaign(campaign: CampaignCreate):
 async def list_campaigns(
     status: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=100)
+    limit: int = Query(50, ge=1, le=100),
+    _: str = Depends(get_current_user)
 ):
     """List all campaigns with optional filtering"""
     supabase = get_supabase_client()
@@ -85,7 +87,7 @@ async def list_campaigns(
 
 
 @router.get("/campaigns/{campaign_id}", response_model=CampaignResponse)
-async def get_campaign(campaign_id: UUID):
+async def get_campaign(campaign_id: UUID, _: str = Depends(get_current_user)):
     """Get a specific campaign by ID"""
     supabase = get_supabase_client()
     
@@ -98,7 +100,7 @@ async def get_campaign(campaign_id: UUID):
 
 
 @router.patch("/campaigns/{campaign_id}", response_model=CampaignResponse)
-async def update_campaign(campaign_id: UUID, campaign: CampaignUpdate):
+async def update_campaign(campaign_id: UUID, campaign: CampaignUpdate, _: str = Depends(get_current_user)):
     """Update a campaign"""
     supabase = get_supabase_client()
     
@@ -122,7 +124,7 @@ async def update_campaign(campaign_id: UUID, campaign: CampaignUpdate):
 
 
 @router.delete("/campaigns/{campaign_id}", status_code=204)
-async def delete_campaign(campaign_id: UUID):
+async def delete_campaign(campaign_id: UUID, _: str = Depends(get_current_user)):
     """Delete a campaign and all associated data"""
     supabase = get_supabase_client()
     
@@ -141,7 +143,7 @@ async def delete_campaign(campaign_id: UUID):
 
 
 @router.get("/campaigns/{campaign_id}/stats", response_model=CampaignStats)
-async def get_campaign_stats(campaign_id: UUID):
+async def get_campaign_stats(campaign_id: UUID, _: str = Depends(get_current_user)):
     """Get detailed statistics for a campaign"""
     supabase = get_supabase_client()
     
@@ -288,7 +290,11 @@ async def delete_recipient(recipient_id: UUID):
 # ============================================
 
 @router.post("/campaigns/{campaign_id}/import-csv/preview", response_model=CSVPreviewResponse)
-async def preview_csv(campaign_id: UUID, file: UploadFile = File(...)):
+async def preview_csv(
+    campaign_id: UUID,
+    file: UploadFile = File(...),
+    _: str = Depends(get_current_user)
+):
     """Preview CSV file before importing"""
     if not file.filename.endswith('.csv'):
         raise HTTPException(status_code=400, detail="File must be a CSV")
@@ -357,7 +363,8 @@ async def preview_csv(campaign_id: UUID, file: UploadFile = File(...)):
 async def import_csv(
     campaign_id: UUID,
     file: UploadFile = File(...),
-    column_mapping: str = Query(..., description="JSON string with column mapping")
+    column_mapping: str = Query(..., description="JSON string with column mapping"),
+    _: str = Depends(get_current_user)
 ):
     """Import recipients from CSV file"""
     import json
@@ -493,7 +500,8 @@ async def import_csv(
 async def send_campaign(
     campaign_id: UUID,
     request: CampaignSendRequest,
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
+    _: str = Depends(get_current_user)
 ):
     """Start sending a campaign"""
     from features.campaigns.tasks import process_campaign_send

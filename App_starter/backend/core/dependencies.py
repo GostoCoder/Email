@@ -5,11 +5,17 @@ from core.config import Settings, get_settings
 
 def get_current_user(
     x_forwarded_user: str | None = Header(default=None, convert_underscores=False),
+    settings: Settings = Depends(get_settings),
 ) -> str:
     """
     Get current user from ForwardAuth header.
-    Required for production - raises 401 if missing.
+    In development mode, returns a default user.
+    In production, raises 401 if missing.
     """
+    # In development mode, allow unauthenticated access
+    if settings.app_env == "development":
+        return x_forwarded_user or "dev-user"
+    
     if not x_forwarded_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

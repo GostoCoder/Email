@@ -116,6 +116,80 @@ class SendGridProvider(EmailProviderBase):
         return await asyncio.gather(*tasks)
 
 
+class SMTPProvider(EmailProviderBase):
+    """SMTP email provider (Gmail, Outlook, etc.)"""
+    
+    def __init__(self, host: str, port: int, username: str, password: str, use_tls: bool = True):
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.use_tls = use_tls
+    
+    async def send_email(self, message: EmailMessage) -> Dict[str, Any]:
+        """Send email via SMTP"""
+        import smtplib
+        
+        try:
+            # Build MIME message
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = message.subject
+            msg['From'] = f"{message.from_name} <{message.from_email}>"
+            msg['To'] = message.to_email
+            msg['Reply-To'] = message.reply_to or message.from_email
+            
+            # Add custom headers (List-Unsubscribe, etc.)
+            if message.headers:
+                for key, value in message.headers.items():
+                    msg[key] = value
+            
+            # Add HTML content
+            html_part = MIMEText(message.html_content, 'html')
+            msg.attach(html_part)
+            
+            # Send email synchronously (wrapped in thread for async)
+            loop = asyncio.get_event_loop()
+            message_id = await loop.run_in_executor(None, self._send_sync, msg, message.to_email)
+            
+            return {
+                "success": True,
+                "provider": "smtp",
+                "message_id": message_id,
+                "to_email": message.to_email
+            }
+        except Exception as e:
+            logger.error(f"SMTP error for {message.to_email}: {str(e)}")
+            return {
+                "success": False,
+                "provider": "smtp",
+                "error": str(e),
+                "to_email": message.to_email
+            }
+    
+    def _send_sync(self, msg: MIMEMultipart, to_email: str) -> str:
+        """Synchronous SMTP send"""
+        import smtplib
+        import uuid
+        
+        server = smtplib.SMTP(self.host, self.port)
+        try:
+            if self.use_tls:
+                server.starttls()
+            server.login(self.username, self.password)
+            server.sendmail(self.username, to_email, msg.as_string())
+            return str(uuid.uuid4())  # Generate a message ID
+        finally:
+            server.quit()
+    
+    async def send_batch(self, messages: List[EmailMessage]) -> List[Dict[str, Any]]:
+        """Send batch of emails via SMTP"""
+        results = []
+        for msg in messages:
+            result = await self.send_email(msg)
+            results.append(result)
+        return results
+
+
 class MailgunProvider(EmailProviderBase):
     """Mailgun email provider"""
     
@@ -203,6 +277,17 @@ class EmailService:
             if not settings.mailgun_api_key or not settings.mailgun_domain:
                 raise ValueError("Mailgun API key or domain not configured")
             return MailgunProvider(settings.mailgun_api_key, settings.mailgun_domain)
+        
+        elif provider_name == "smtp":
+            if not settings.smtp_username or not settings.smtp_password:
+                raise ValueError("SMTP username or password not configured")
+            return SMTPProvider(
+                host=settings.smtp_host,
+                port=settings.smtp_port,
+                username=settings.smtp_username,
+                password=settings.smtp_password,
+                use_tls=settings.smtp_use_tls
+            )
         
         else:
             raise ValueError(f"Unsupported email provider: {provider_name}")

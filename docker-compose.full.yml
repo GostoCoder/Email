@@ -1,0 +1,178 @@
+# Docker Compose avec Redis et Celery
+# Pour utiliser toutes les nouvelles fonctionnalités
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # Redis - Cache & Message Broker
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: email-campaign-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - email-network
+
+  # ==========================================
+  # Backend API
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: email-campaign-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Core
+      - DEBUG=false
+      - APP_NAME=Email Campaign Platform
+      - ALLOWED_ORIGINS=http://localhost,http://localhost:5173,http://localhost:3000
+      
+      # Supabase
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      
+      # Email Provider
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-sendgrid}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SENDGRID_WEBHOOK_VERIFICATION_KEY=${SENDGRID_WEBHOOK_VERIFICATION_KEY}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      
+      # Redis
+      - REDIS_URL=redis://redis:6379/0
+      
+      # Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      
+      # Rate Limiting
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_PER_MINUTE=100
+      
+      # Observability
+      - ENABLE_METRICS=true
+      - LOG_LEVEL=INFO
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - email-network
+
+  # ==========================================
+  # Celery Worker
+  # ==========================================
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: email-campaign-celery-worker
+    command: celery -A core.celery_tasks worker --loglevel=info --concurrency=4
+    environment:
+      # Same as backend
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-sendgrid}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+      - backend
+    volumes:
+      - ./backend:/app
+    networks:
+      - email-network
+
+  # ==========================================
+  # Celery Beat Scheduler
+  # ==========================================
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: email-campaign-celery-beat
+    command: celery -A core.celery_tasks beat --loglevel=info
+    environment:
+      # Same as backend
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+      - backend
+    volumes:
+      - ./backend:/app
+    networks:
+      - email-network
+
+  # ==========================================
+  # Frontend
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: email-campaign-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - email-network
+
+  # ==========================================
+  # Flower - Celery Monitoring (optional)
+  # ==========================================
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: email-campaign-flower
+    command: celery -A core.celery_tasks flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - email-network
+
+networks:
+  email-network:
+    driver: bridge
+
+volumes:
+  redis_data:

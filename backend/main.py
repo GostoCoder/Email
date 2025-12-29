@@ -73,9 +73,11 @@ app = FastAPI(
 # ==========================================
 
 # CORS - must be first to handle preflight requests
+# Convert AnyHttpUrl to strings and remove trailing slashes for CORS middleware
+cors_origins = [str(origin).rstrip('/') for origin in settings.allowed_origins]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -16,11 +16,11 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 class CampaignBase(BaseModel):
     """Base campaign schema"""
     name: str = Field(..., min_length=1, max_length=255)
-    subject: str = Field(..., min_length=1, max_length=500)
-    from_name: str = Field(..., min_length=1, max_length=255)
-    from_email: EmailStr
+    subject: Optional[str] = Field(None, min_length=1, max_length=500)
+    from_name: Optional[str] = Field(None, min_length=1, max_length=255)
+    from_email: Optional[EmailStr] = None
     reply_to: Optional[EmailStr] = None
-    html_content: str = Field(..., min_length=1)
+    html_content: Optional[str] = Field(None, min_length=1)
     template_id: Optional[UUID] = None
     batch_size: int = Field(default=100, ge=1, le=1000)
     rate_limit_per_second: int = Field(default=10, ge=1, le=100)

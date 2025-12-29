@@ -39,11 +39,8 @@ Cette version apporte **12 améliorations majeures** transformant l'application 
 - nginx (reverse proxy)
 - Traefik-ready
 
-**Email Providers:**
-- SendGrid
-- Mailgun
-- AWS SES
-- SMTP générique
+**Email Provider:**
+- SMTP générique (unique provider)
 
 ## ⚡ Démarrage Rapide
 
@@ -51,7 +48,7 @@ Cette version apporte **12 améliorations majeures** transformant l'application 
 
 - Docker & Docker Compose
 - Compte Supabase
-- Un email provider (SendGrid, Mailgun, ou AWS SES)
+- Un accès SMTP (hôte, port, identifiants)
 
 ### Installation en 5 minutes
 
@@ -171,7 +168,7 @@ GET /v1/analytics/trends?period=7d
 ### 5. Gestion des Bounces
 
 - Classification automatique hard/soft
-- Webhooks pour SendGrid, Mailgun, AWS SES
+- Gestion des bounces via réponses SMTP + suppression automatique
 - Suppression automatique après seuils
 - Alertes administrateur
 - Statistiques détaillées
@@ -193,9 +190,13 @@ GET /v1/analytics/trends?period=7d
 SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=xxx
 
-# Email Provider (choisir un)
-EMAIL_PROVIDER=sendgrid
-SENDGRID_API_KEY=SG.xxx
+# Email Provider (SMTP uniquement)
+EMAIL_PROVIDER=smtp
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-smtp-username
+SMTP_PASSWORD=your-smtp-password
+SMTP_USE_TLS=true
 
 # Redis
 REDIS_URL=redis://localhost:6379/0

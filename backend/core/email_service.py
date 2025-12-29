@@ -1,6 +1,6 @@
 """
 Email Provider Service
-Abstraction layer for sending emails via multiple providers (SendGrid, Mailgun, AWS SES)
+SMTP-only implementation (SendGrid, Mailgun et AWS SES supprimés)
 """
 
 import asyncio
@@ -52,68 +52,6 @@ class EmailProviderBase(ABC):
     async def send_batch(self, messages: List[EmailMessage]) -> List[Dict[str, Any]]:
         """Send multiple emails"""
         pass
-
-
-class SendGridProvider(EmailProviderBase):
-    """SendGrid email provider"""
-    
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        try:
-            from sendgrid import SendGridAPIClient
-            from sendgrid.helpers.mail import Mail, Header
-            self.sg_client = SendGridAPIClient(api_key)
-            self.Mail = Mail
-            self.Header = Header
-        except ImportError:
-            raise ImportError("SendGrid library not installed. Run: pip install sendgrid")
-    
-    async def send_email(self, message: EmailMessage) -> Dict[str, Any]:
-        """Send email via SendGrid"""
-        try:
-            mail = self.Mail(
-                from_email=(message.from_email, message.from_name),
-                to_emails=message.to_email,
-                subject=message.subject,
-                html_content=message.html_content
-            )
-            
-            # Add reply-to
-            if message.reply_to:
-                mail.reply_to = message.reply_to
-            
-            # Add custom headers (including List-Unsubscribe)
-            if message.headers:
-                for key, value in message.headers.items():
-                    mail.add_header(self.Header(key, value))
-            
-            # Add custom args for tracking
-            if message.custom_args:
-                for key, value in message.custom_args.items():
-                    mail.add_custom_arg(key, str(value))
-            
-            response = self.sg_client.send(mail)
-            
-            return {
-                "success": True,
-                "provider": "sendgrid",
-                "status_code": response.status_code,
-                "message_id": response.headers.get("X-Message-Id"),
-                "to_email": message.to_email
-            }
-        except Exception as e:
-            logger.error(f"SendGrid error: {str(e)}")
-            return {
-                "success": False,
-                "provider": "sendgrid",
-                "error": str(e),
-                "to_email": message.to_email
-            }
-    
-    async def send_batch(self, messages: List[EmailMessage]) -> List[Dict[str, Any]]:
-        """Send batch of emails via SendGrid"""
-        tasks = [self.send_email(msg) for msg in messages]
-        return await asyncio.gather(*tasks)
 
 
 class SMTPProvider(EmailProviderBase):
@@ -190,69 +128,6 @@ class SMTPProvider(EmailProviderBase):
         return results
 
 
-class MailgunProvider(EmailProviderBase):
-    """Mailgun email provider"""
-    
-    def __init__(self, api_key: str, domain: str):
-        self.api_key = api_key
-        self.domain = domain
-        self.base_url = f"https://api.mailgun.net/v3/{domain}/messages"
-    
-    async def send_email(self, message: EmailMessage) -> Dict[str, Any]:
-        """Send email via Mailgun"""
-        try:
-            import httpx
-            
-            data = {
-                "from": f"{message.from_name} <{message.from_email}>",
-                "to": message.to_email,
-                "subject": message.subject,
-                "html": message.html_content,
-                "h:Reply-To": message.reply_to
-            }
-            
-            # Add custom headers
-            if message.headers:
-                for key, value in message.headers.items():
-                    data[f"h:{key}"] = value
-            
-            # Add custom variables
-            if message.custom_args:
-                for key, value in message.custom_args.items():
-                    data[f"v:{key}"] = str(value)
-            
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    self.base_url,
-                    auth=("api", self.api_key),
-                    data=data,
-                    timeout=30.0
-                )
-                
-                result = response.json()
-                
-                return {
-                    "success": response.status_code == 200,
-                    "provider": "mailgun",
-                    "status_code": response.status_code,
-                    "message_id": result.get("id"),
-                    "to_email": message.to_email
-                }
-        except Exception as e:
-            logger.error(f"Mailgun error: {str(e)}")
-            return {
-                "success": False,
-                "provider": "mailgun",
-                "error": str(e),
-                "to_email": message.to_email
-            }
-    
-    async def send_batch(self, messages: List[EmailMessage]) -> List[Dict[str, Any]]:
-        """Send batch of emails via Mailgun"""
-        tasks = [self.send_email(msg) for msg in messages]
-        return await asyncio.gather(*tasks)
-
-
 class EmailService:
     """
     Main email service with rate limiting and batch processing
@@ -265,32 +140,24 @@ class EmailService:
         self._last_send_time = 0
     
     def _initialize_provider(self) -> EmailProviderBase:
-        """Initialize the configured email provider"""
+        """Initialize the configured email provider (SMTP only)"""
         provider_name = settings.email_provider.lower()
-        
-        if provider_name == "sendgrid":
-            if not settings.sendgrid_api_key:
-                raise ValueError("SendGrid API key not configured")
-            return SendGridProvider(settings.sendgrid_api_key)
-        
-        elif provider_name == "mailgun":
-            if not settings.mailgun_api_key or not settings.mailgun_domain:
-                raise ValueError("Mailgun API key or domain not configured")
-            return MailgunProvider(settings.mailgun_api_key, settings.mailgun_domain)
-        
-        elif provider_name == "smtp":
-            if not settings.smtp_username or not settings.smtp_password:
-                raise ValueError("SMTP username or password not configured")
-            return SMTPProvider(
-                host=settings.smtp_host,
-                port=settings.smtp_port,
-                username=settings.smtp_username,
-                password=settings.smtp_password,
-                use_tls=settings.smtp_use_tls
+
+        if provider_name != "smtp":
+            raise ValueError(
+                "Only SMTP is supported. Set EMAIL_PROVIDER=smtp and configure SMTP_* variables."
             )
-        
-        else:
-            raise ValueError(f"Unsupported email provider: {provider_name}")
+
+        if not settings.smtp_username or not settings.smtp_password:
+            raise ValueError("SMTP username or password not configured")
+
+        return SMTPProvider(
+            host=settings.smtp_host,
+            port=settings.smtp_port,
+            username=settings.smtp_username,
+            password=settings.smtp_password,
+            use_tls=settings.smtp_use_tls
+        )
     
     async def _apply_rate_limit(self):
         """Apply rate limiting between sends"""

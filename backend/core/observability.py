@@ -83,16 +83,19 @@ class ContextualLogger(logging.LoggerAdapter):
 request_id_context: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
 
 
-def setup_logging(log_level: str = "INFO", json_format: bool = True):
+def setup_logging(log_level: str | int = "INFO", json_format: bool = True):
     """
     Configure application logging.
     
     Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR)
+        log_level: Logging level (DEBUG, INFO, WARNING, ERROR) or int
         json_format: If True, use JSON formatting
     """
     root_logger = logging.getLogger()
-    root_logger.setLevel(getattr(logging, log_level.upper()))
+    if isinstance(log_level, str):
+        root_logger.setLevel(getattr(logging, log_level.upper()))
+    else:
+        root_logger.setLevel(log_level)
     
     # Clear existing handlers
     root_logger.handlers = []

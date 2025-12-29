@@ -130,9 +130,6 @@ def validate_all_secrets(is_production: bool = False) -> SecretValidationResult:
     # Validate email provider configuration
     email_provider = settings.email_provider
     provider_secrets = {
-        "sendgrid": ["sendgrid_api_key"],
-        "mailgun": ["mailgun_api_key", "mailgun_domain"],
-        "ses": ["aws_access_key_id", "aws_secret_access_key"],
         "smtp": ["smtp_username", "smtp_password"],
     }
     

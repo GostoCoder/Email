@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     app_name: str = Field(default="app-starter")
     app_env: str = Field(default="development")
+    debug: bool = Field(default=False)
     allowed_origins: List[AnyHttpUrl] = Field(default_factory=list)
     log_level: str = Field(default="INFO")
 
@@ -17,16 +18,10 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(default="change-me", min_length=8)
     redis_url: str | None = None
 
-    # Email service configuration
-    email_provider: str = Field(default="smtp")  # smtp, sendgrid, mailgun, ses
-    sendgrid_api_key: str | None = None
-    mailgun_api_key: str | None = None
-    mailgun_domain: str | None = None
-    aws_access_key_id: str | None = None
-    aws_secret_access_key: str | None = None
-    aws_region: str = Field(default="eu-west-1")
+    # Email service configuration (SMTP only)
+    email_provider: str = Field(default="smtp")
     
-    # SMTP Configuration (for Gmail or other SMTP servers)
+    # SMTP Configuration (for Gmail ou autre serveur SMTP)
     smtp_host: str = Field(default="smtp.gmail.com")
     smtp_port: int = Field(default=587)
     smtp_username: str | None = None
@@ -55,3 +50,6 @@ class Settings(BaseSettings):
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings()
+
+
+settings = get_settings()

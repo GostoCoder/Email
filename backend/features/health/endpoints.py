@@ -124,13 +124,13 @@ async def readiness():
 async def check_supabase() -> ComponentHealth:
     """Check Supabase database connectivity"""
     try:
-        from core.supabase import get_supabase
+        from core.supabase import get_supabase_client
         
         start = time.time()
-        supabase = await get_supabase()
+        supabase = get_supabase_client()
         
         # Try a simple query
-        result = supabase.table("email_campaigns").select("id").limit(1).execute()
+        result = supabase.table("campaigns").select("id").limit(1).execute()
         
         latency = (time.time() - start) * 1000
         
@@ -152,7 +152,7 @@ async def check_redis() -> ComponentHealth:
     try:
         import redis.asyncio as redis
         
-        if not hasattr(settings, 'REDIS_URL'):
+        if not settings.redis_url:
             return ComponentHealth(
                 healthy=True,
                 message="Not configured (optional)"
@@ -161,7 +161,7 @@ async def check_redis() -> ComponentHealth:
         start = time.time()
         
         # Try to connect
-        r = redis.from_url(settings.REDIS_URL, decode_responses=True)
+        r = redis.from_url(settings.redis_url, decode_responses=True)
         await r.ping()
         await r.close()
         
@@ -209,11 +209,11 @@ def check_scheduler() -> ComponentHealth:
 def check_email_config() -> ComponentHealth:
     """Check if email provider is configured"""
     try:
-        provider = settings.EMAIL_PROVIDER
+        provider = settings.email_provider
         
         if not provider or provider == "smtp":
             # Check SMTP config
-            if not settings.SMTP_HOST:
+            if not settings.smtp_host:
                 return ComponentHealth(
                     healthy=False,
                     message="No email provider configured"

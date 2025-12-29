@@ -20,15 +20,14 @@ from features.bounces.endpoints import router as bounces_router
 # Security & Observability
 from core.rate_limiter import RateLimitMiddleware, AbuseDetectionMiddleware
 from core.observability import ObservabilityMiddleware, setup_logging
-from core.secrets_manager import validate_secrets_on_startup
-from core.security import SecurityHeadersMiddleware
+from core.secrets_manager import validate_secrets_on_startup, SecurityHeadersMiddleware
 
 settings = get_settings()
 
 # Setup structured logging
 setup_logging(
-    log_level=logging.DEBUG if settings.DEBUG else logging.INFO,
-    json_format=not settings.DEBUG
+    log_level=logging.DEBUG if settings.debug else logging.INFO,
+    json_format=not settings.debug
 )
 
 logger = logging.getLogger(__name__)
@@ -42,10 +41,10 @@ async def lifespan(app: FastAPI):
     
     # Validate secrets on startup (warns in dev, fails in prod if critical secrets missing)
     try:
-        validate_secrets_on_startup(settings)
+        validate_secrets_on_startup()
     except Exception as e:
         logger.error(f"Secret validation failed: {e}")
-        if not settings.DEBUG:
+        if not settings.debug:
             raise
     
     # Initialize the scheduler
@@ -65,8 +64,8 @@ app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     lifespan=lifespan,
-    docs_url="/docs" if settings.DEBUG else None,
-    redoc_url="/redoc" if settings.DEBUG else None,
+    docs_url="/docs" if settings.debug else None,
+    redoc_url="/redoc" if settings.debug else None,
 )
 
 # ==========================================

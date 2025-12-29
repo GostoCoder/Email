@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS email_logs (
     -- Types: sent, delivered, opened, clicked, bounced, failed, unsubscribed
     event_data JSONB DEFAULT '{}',
     provider_message_id VARCHAR(255),
-    -- ID du message chez le provider (SendGrid, Mailgun)
+    -- ID du message renvoyé par le provider SMTP/gateway
     error_code VARCHAR(100),
     error_message TEXT,
     timestamp TIMESTAMPTZ DEFAULT NOW(),
